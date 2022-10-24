@@ -16,16 +16,16 @@
 
 package org.springframework.core.io;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * {@link Resource} implementation for class path resources. Uses either a
@@ -163,17 +163,24 @@ public class ClassPathResource extends AbstractFileResolvingResource {
 	 * This implementation opens an InputStream for the given class path resource.
 	 * @see java.lang.ClassLoader#getResourceAsStream(String)
 	 * @see java.lang.Class#getResourceAsStream(String)
+	 *
+	 * 1、StreamTest.class.getResourceAsStream()在没有写“/”时默认获取当前类文件的资源。
+	 *
+	 * 2、ClassLoader.getSystemResourceAsStream()在没有写“/”时获取的是根目录下的资源文件。
 	 */
 	@Override
 	public InputStream getInputStream() throws IOException {
 		InputStream is;
 		if (this.clazz != null) {
+			//这种方式会使用系统类加载器的子类去搜索配置文件，本质仍是系统类加载器；
+			//但这种方式既能获取this的类加载器的资源，也能获取系统类加载器的资源
 			is = this.clazz.getResourceAsStream(this.path);
 		}
 		else if (this.classLoader != null) {
 			is = this.classLoader.getResourceAsStream(this.path);
 		}
 		else {
+			//这种方式会使用系统类加载器去搜索配置文件
 			is = ClassLoader.getSystemResourceAsStream(this.path);
 		}
 		if (is == null) {

@@ -16,30 +16,14 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.beans.Introspector;
 import java.io.Closeable;
 import java.io.Externalizable;
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.lang.Nullable;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Miscellaneous {@code java.lang.Class} utility methods.
@@ -179,6 +163,21 @@ public abstract class ClassUtils {
 	public static ClassLoader getDefaultClassLoader() {
 		ClassLoader cl = null;
 		try {
+			/**
+			 * 返回该线程的ClassLoader上下文。线程创建者提供ClassLoader上下文，以便运行在该线程的代码在加载类和资源时使用。
+			 * 如果没有，则默认返回父线程的ClassLoader上下文。原始线程的上下文 ClassLoader 通常设定为用于加载应用程序的类加载器。
+			 *
+			 * 首先，如果有安全管理器，并且调用者的类加载器不是 null，也不同于其上下文类加载器正在被请求的线程上下文类加载器的祖先，
+			 * 则通过 RuntimePermission("getClassLoader") 权限调用该安全管理器的 checkPermission 方法，
+			 * 查看是否可以获取上下文 ClassLoader。
+			 *
+			 * 应用：
+			 *
+			 * 在阅读org.apache.commons.beanutils.BeanUtils#copyProperties源码时，
+			 * 发现里面用到了类org.apache.commons.beanutils.ContextClassLoaderLocal，
+			 * 该类中的map让ClassLoader作为key，通过以上的描述，在一个JVM程序中，得到的ClassLoader是一个，
+			 * 所以可以作为一个全局的key存在。
+			 */
 			cl = Thread.currentThread().getContextClassLoader();
 		}
 		catch (Throwable ex) {
