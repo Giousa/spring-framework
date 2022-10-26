@@ -1,7 +1,10 @@
 buildscript {
 	repositories {
 		gradlePluginPortal()
-		maven { url "https://repo.spring.io/plugins-release" }
+//		maven { url "https://repo.spring.io/plugins-release" }
+		//阿里云镜像选择
+		//https://blog.csdn.net/xiangxiaotian666/article/details/127399904?spm=1001.2101.3001.6650.7&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-7-127399904-blog-106800878.pc_relevant_3mothn_strategy_and_data_recovery&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-7-127399904-blog-106800878.pc_relevant_3mothn_strategy_and_data_recovery&utm_relevant_index=8
+		maven { url "https://maven.aliyun.com/repository/spring-plugin" }
 	}
 	dependencies {
 		classpath("io.spring.gradle:propdeps-plugin:0.0.9.RELEASE")
@@ -152,6 +155,8 @@ configure(allprojects) { project ->
 	}
 
 	repositories {
+		maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+		maven { url "https://maven.aliyun.com/repository/public" }
 		mavenCentral()
 		maven { url "https://repo.spring.io/libs-spring-framework-build" }
 	}
