@@ -1,6 +1,7 @@
 package org.springframework.test;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -33,7 +34,11 @@ public class BeanFactoryTest {
     public static void testSimpleLoad(){
         BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("beanFactoryTest.xml"));
 
-        MyTestBean myTestBean = (MyTestBean) beanFactory.getBean("myTestBean");
+		/**
+		 * getBean方法的具体实现
+		 * @see AbstractBeanFactory#doGetBean(java.lang.String, java.lang.Class, java.lang.Object[], boolean)
+		 */
+		MyTestBean myTestBean = (MyTestBean) beanFactory.getBean("myTestBean");
 
         String str = myTestBean.getTestStr();
 
