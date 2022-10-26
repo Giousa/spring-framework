@@ -12,8 +12,8 @@ public class BeanFactoryTest {
 
 
 	public static void main(String[] args) {
-//		testSimpleLoad();
-		getInputStream();
+		testSimpleLoad();
+//		getInputStream();
 	}
 
 	public static void getInputStream(){
