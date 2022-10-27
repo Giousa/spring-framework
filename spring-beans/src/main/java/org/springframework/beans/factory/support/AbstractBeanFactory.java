@@ -202,6 +202,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// Eagerly check singleton cache for manually registered singletons.
 		//获取缓存的实例。
+		// 第一次，获取都是null且singletonsCurrentlyInCreation里面没有包含
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isDebugEnabled()) {
@@ -281,8 +282,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// Create bean instance.
 				// 实例化依赖的bean后，实例化mod本身
 				if (mbd.isSingleton()) {
+					//获取单例
+					//getSingleton中，在singletonFactory.getObject()前，会将bean添加到singletonsCurrentlyInCreation
+					//倘若已经这也是刚开始执行：Object sharedInstance = getSingleton(beanName);  方法的时候，做的预处理
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+							/**
+							 * 创建bean
+							 * 这个时候，会将普通的beanName，转换为ObjectFactory，后期可以直接调用转换
+							 * @see AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])
+							 */
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {
@@ -1600,7 +1609,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
-		//判断实例的ame是不是工厂相关(&前缀)
+		//判断实例的name是不是工厂相关(&前缀)
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			//判断beanInstance是否是NullBean类型，如果是，直接返回
 			if (beanInstance instanceof NullBean) {

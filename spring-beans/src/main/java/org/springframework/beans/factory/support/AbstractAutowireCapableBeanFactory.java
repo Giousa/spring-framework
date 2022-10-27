@@ -524,6 +524,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						"' to allow for resolving potential circular references");
 			}
 			//为避免循环依赖，可以在bean初始化完成前将创建实例的ObjectFactory加入工厂
+			//将普通的beanName，转换为ObjectFactory，后期可以直接调用转换
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
