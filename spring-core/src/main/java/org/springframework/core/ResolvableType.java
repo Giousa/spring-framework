@@ -16,30 +16,18 @@
 
 package org.springframework.core;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import org.springframework.core.SerializableTypeWrapper.FieldTypeProvider;
 import org.springframework.core.SerializableTypeWrapper.MethodParameterTypeProvider;
 import org.springframework.core.SerializableTypeWrapper.TypeProvider;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
+
+import java.io.Serializable;
+import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Encapsulates a Java {@link java.lang.reflect.Type}, providing access to
@@ -93,9 +81,12 @@ public class ResolvableType implements Serializable {
 	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache =
 			new ConcurrentReferenceHashMap<>(256);
 
-
 	/**
-	 * The underlying Java type being managed.
+	 * Type 表示类型，java 所有的原生类型、参数化类型、变量类型、原子类型等都是该类实现。其主要实现有：
+	 * java.lang.Class 类
+	 * java.lang.reflect.ParameterizedType  参数化类型
+	 * java.lang.reflect.WildcardType WildcardType represents a wildcard type expression, such as {@code ?}, {@code ? extends Number}, or {@code ? super Integer}
+	 * java.lang.reflect.TypeVariable  List<T> 这样的类型
 	 */
 	private final Type type;
 

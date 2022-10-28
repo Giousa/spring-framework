@@ -197,6 +197,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
+		System.out.println("getSingleton start.....");
 		//全局变量，需要同步
 		synchronized (this.singletonObjects) {
 			Object singletonObject = this.singletonObjects.get(beanName);
@@ -209,7 +210,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				//创建bean前
+				//创建bean前,记录到singletonsCurrentlyInCreation缓存中
 				beforeSingletonCreation(beanName);
 
 				boolean newSingleton = false;
@@ -220,6 +221,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				try {
 					//获取bean
 					singletonObject = singletonFactory.getObject();
+					System.out.println("使用createBean创建的对象...singletonObject: "+singletonObject);
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {
