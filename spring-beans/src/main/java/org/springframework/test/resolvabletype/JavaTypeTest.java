@@ -4,20 +4,22 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Type 表示类型，java 所有的原生类型、参数化类型、变量类型、原子类型等都是该类实现。其主要实现有：
+ * java.lang.Class 类
+ * java.lang.reflect.ParameterizedType  参数化类型
+ * java.lang.reflect.WildcardType WildcardType represents a wildcard type expression, such as {@code ?}, {@code ? extends Number}, or {@code ? super Integer}
+ * java.lang.reflect.TypeVariable  List<T> 这样的类型
+ */
 public class JavaTypeTest {
 
 	public static void main(String[] args) throws Exception {
-		/**
-		 * Type 表示类型，java 所有的原生类型、参数化类型、变量类型、原子类型等都是该类实现。其主要实现有：
-		 * java.lang.Class 类
-		 * java.lang.reflect.ParameterizedType  参数化类型
-		 * java.lang.reflect.WildcardType WildcardType represents a wildcard type expression, such as {@code ?}, {@code ? extends Number}, or {@code ? super Integer}
-		 * java.lang.reflect.TypeVariable  List<T> 这样的类型
-		 */
-
+		System.out.println("JavaTypeTest start......");
 		// 类
 		Type[] genericInterfaces = WrapperTest.class.getGenericInterfaces();
 		System.out.println("类genericInterfaces = " + genericInterfaces);
@@ -49,4 +51,12 @@ public class JavaTypeTest {
 	}
 
 
+	public static List<String> test01(List<Integer> datas, Map<String, Object> map, String s, WrapperTest wrapper, String[] strs, int[] ints) throws NoSuchMethodException {
+		System.out.println("执行了test01方法");
+
+		List<String> list = new ArrayList<>();
+		list.add("这个是测试");
+		list.add("你好呀");
+		return list;
+	}
 }

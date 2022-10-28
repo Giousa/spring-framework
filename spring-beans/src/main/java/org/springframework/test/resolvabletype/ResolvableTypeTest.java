@@ -9,16 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *   ResolvableType 实际是对 java.lang.reflect.Type 类的包装，并且提供了访问下面方法。官方介绍如下：
+ *   Encapsulates a Java {@link java.lang.reflect.Type}, providing access to
+ *   {@link #getSuperType() supertypes}, {@link #getInterfaces() interfaces}, and
+ *   {@link #getGeneric(int...) generic parameters} along with the ability to ultimately
+ *   {@link #resolve() resolve} to a {@link java.lang.Class}.
+ */
 public class ResolvableTypeTest {
 
 	public static void main(String[] args) throws NoSuchFieldException, NoSuchMethodException {
-		/** ResolvableType 实际是对 java.lang.reflect.Type 类的包装，并且提供了访问下面方法。官方介绍如下：
-		 *   Encapsulates a Java {@link java.lang.reflect.Type}, providing access to
-		 *   {@link #getSuperType() supertypes}, {@link #getInterfaces() interfaces}, and
-		 *   {@link #getGeneric(int...) generic parameters} along with the ability to ultimately
-		 *   {@link #resolve() resolve} to a {@link java.lang.Class}.
-		 */
-
 		// 1. 类测试
 		ResolvableType resolvableType = ResolvableType.forClass(IInterface1.class);
 		// 获取接口
