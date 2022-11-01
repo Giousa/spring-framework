@@ -12,22 +12,23 @@ import java.util.Map;
 /**
  *   ResolvableType 实际是对 java.lang.reflect.Type 类的包装，并且提供了访问下面方法。官方介绍如下：
  *   Encapsulates a Java {@link java.lang.reflect.Type}, providing access to
- *   {@link #getSuperType() supertypes}, {@link #getInterfaces() interfaces}, and
- *   {@link #getGeneric(int...) generic parameters} along with the ability to ultimately
- *   {@link #resolve() resolve} to a {@link java.lang.Class}.
  */
 public class ResolvableTypeTest {
 
 	public static void main(String[] args) throws NoSuchFieldException, NoSuchMethodException {
 		// 1. 类测试
 		ResolvableType resolvableType = ResolvableType.forClass(IInterface1.class);
+		System.out.println("类：resolvableType： "+resolvableType);
 		// 获取接口
 		ResolvableType[] interfaces = resolvableType.getInterfaces();
+		System.out.println("类：接口interfaces： "+interfaces);
 		// 获取泛型
 		ResolvableType[] generics = resolvableType.getGenerics();
+		System.out.println("类：泛型generics： "+generics);
 		ResolvableType generic = resolvableType.getGeneric(1);
 		// 获取父类
 		ResolvableType superType = resolvableType.getSuperType();
+		System.out.println("类：父类superType： "+superType);
 
 		// 2. 属性测试
 		// 获取字段属性

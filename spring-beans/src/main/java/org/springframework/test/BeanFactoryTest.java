@@ -39,8 +39,7 @@ public class BeanFactoryTest {
 		 * @see AbstractBeanFactory#doGetBean(java.lang.String, java.lang.Class, java.lang.Object[], boolean)
 		 */
 		MyTestBean myTestBean = (MyTestBean) beanFactory.getBean("myTestBean");
-
-        String str = myTestBean.getTestStr();
+		String str = myTestBean.getTestStr();
 
         System.out.println("result >>>> "+str);
     }

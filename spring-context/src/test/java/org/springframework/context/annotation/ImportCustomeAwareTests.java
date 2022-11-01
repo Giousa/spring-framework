@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
  * @author Juergen Hoeller
  * @since 3.1
  */
-public class ImportAwareTests {
+public class ImportCustomeAwareTests {
 
 	@Test
 	public void directlyAnnotatedWithImport() {
