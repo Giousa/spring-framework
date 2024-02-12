@@ -60,12 +60,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/** Cache of singleton objects: bean name --> bean instance */
+	//一级缓存
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name --> ObjectFactory */
+	//三级缓存
+	//ObjectFactory是Lambda的函数表达式，可以作为方法的参数写入，一开始lambda表达式不会执行，只有调用ObjectFactoryd的getObject方法的时候才会
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name --> bean instance */
+	//二级缓存
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order */
@@ -139,9 +143,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
+			//如果三级缓存查询为空，需要放入
 			if (!this.singletonObjects.containsKey(beanName)) {
+				//放入三级缓存
 				this.singletonFactories.put(beanName, singletonFactory);
+				//从二级缓存移除
 				this.earlySingletonObjects.remove(beanName);
+				//将beanName添加到已注册的单例集中
 				this.registeredSingletons.add(beanName);
 			}
 		}
@@ -154,6 +162,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 获取单例对象，这个是采用了三级缓存进行逐步判断查询
+	 *
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
@@ -163,22 +173,22 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		//检查缓存中，是否存在实例
+		//检查一级缓存中，是否存在实例
 		Object singletonObject = this.singletonObjects.get(beanName);
 
-		//倘若不存在实例，但是singletonsCurrentlyInCreation里面已经包含，那么就不能直接返回，需要继续向下执行
+		//倘若一级缓存不存在实例，但是singletonsCurrentlyInCreation里面已经包含，那么就不能直接返回，需要继续向下执行
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
-				//检测是否已经提前初始化
+				//检测是否已经提前初始化（也就是二级缓存，是否存在）
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				if (singletonObject == null && allowEarlyReference) {
-					//初始化实例
+					//初始化实例 （去三级缓存里面，进行查询）
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
 						singletonObject = singletonFactory.getObject();
-						//初始化成功，放入提前初始化池子
+						//初始化成功，放入提前初始化池子（获取到三级缓存的实例，需要放入二级缓存）
 						this.earlySingletonObjects.put(beanName, singletonObject);
-						//原始池子里面，实例进行移除
+						//原始池子里面，实例进行移除 （移除三级缓存的实例信息）
 						this.singletonFactories.remove(beanName);
 					}
 				}
@@ -198,10 +208,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		System.out.println("getSingleton start.....");
-		//全局变量，需要同步
+		//全局变量，需要同步；使用单例对象的高速缓存Map作为锁，保证线程同步
 		synchronized (this.singletonObjects) {
+			//从一级缓存中获取beanName对应的单例对象（一级缓存）
 			Object singletonObject = this.singletonObjects.get(beanName);
+			//如果单例对象获取不到
 			if (singletonObject == null) {
+				//如果当前在destroySingletons中，需要抛异常
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
@@ -219,7 +232,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
-					//获取bean
+					//获取bean 当函数式方法调用了getObject，那么外部的Lambda就可以执行了
 					singletonObject = singletonFactory.getObject();
 					System.out.println("使用createBean创建的对象...singletonObject: "+singletonObject);
 					newSingleton = true;

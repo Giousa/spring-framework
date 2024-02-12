@@ -70,21 +70,28 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		// Don't override the class with CGLIB if no overrides.
 		if (!bd.hasMethodOverrides()) {
 			Constructor<?> constructorToUse;
+			//锁定对象，保证实例化构造方法是线程安全的
 			synchronized (bd.constructorArgumentLock) {
+				//查看bd对象里面是否含有构造方法
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse == null) {
+					//无构造方法，从bd中获取beanClass
 					final Class<?> clazz = bd.getBeanClass();
+					//如果需要实例化的beanDefinition是一个接口，抛异常
 					if (clazz.isInterface()) {
 						throw new BeanInstantiationException(clazz, "Specified class is an interface");
 					}
 					try {
+						//获取系统安全管理器
 						if (System.getSecurityManager() != null) {
 							constructorToUse = AccessController.doPrivileged(
 									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
+							//获取默认的无参构造器 (注意：clazz.getDeclaredConstructor() 这个方法，是反射里面最常用的)
 							constructorToUse = clazz.getDeclaredConstructor();
 						}
+						//获取到构造器之后，将构造器赋值给bd中的属性
 						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
 					}
 					catch (Throwable ex) {
@@ -92,10 +99,12 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
+			//通过反射生成具体的实例化对象
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
 			// Must generate CGLIB subclass.
+			//必须生成cglib子类
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
 	}

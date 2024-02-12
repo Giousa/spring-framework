@@ -308,7 +308,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			logger.info("Loading XML bean definitions from " + encodedResource);
 		}
 
-		//通过属性来记录已经加载的资源
+		//通过属性来记录已经加载的资源 （EncodedResource 是上面对Resource资源的一个编码包装，但是encoding和charset初始化为null）
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
 			currentResources = new HashSet<>(4);
@@ -319,7 +319,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
 		try {
-			//从encodeResource中获取已经封装的Resource对象，并再次从Resource中获取其中的inputStream
+			//从encodeResource中获取已经封装的Resource对象（EncodedResource），并再次从Resource中获取其中的inputStream
 			/**
 			 * 调用getInputStream方法，实际上是调用：
 			 * @see ClassPathResource#getInputStream()
@@ -387,6 +387,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 		try {
+			//此处获取xml文件的document对象，这个解析过程是由documentLoader完成的
+			//资源文件读取到String字符串是无意义的，但是转成document可以方便解析。
 			Document doc = doLoadDocument(inputSource, resource);
 			return registerBeanDefinitions(doc, resource);
 		}

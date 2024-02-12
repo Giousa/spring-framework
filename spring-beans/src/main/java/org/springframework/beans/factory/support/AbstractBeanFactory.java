@@ -217,6 +217,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 *
+	 * 实际获取bean的方法
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 *
 	 * @param name          the name of the bean to retrieve
@@ -231,12 +233,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly) throws BeansException {
 
-		//获取对应的真正的beanName
+		//获取对应的真正的beanName，为什么不能直接使用，而是进行转换？因为bean有可能有别名，或者是FactoryBean可以用&开头获取到原始的FactoryBean
 		String beanName = transformedBeanName(name);
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		//获取缓存的实例。
+		//获取缓存的实例。提前检查单例缓存中是否有手动注册的单例对象，跟循环依赖有关联
 		// 第一次，获取都是null且singletonsCurrentlyInCreation里面没有包含
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
@@ -306,10 +308,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				// 实例化依赖的bean后，实例化mod本身
+				//创建bean的实例对象
 				if (mbd.isSingleton()) {
 					//获取单例
 					//getSingleton中，在singletonFactory.getObject()前，会将bean添加到singletonsCurrentlyInCreation
 					//倘若已经这也是刚开始执行：Object sharedInstance = getSingleton(beanName);  方法的时候，做的预处理
+					//返回以beanName的（原始）单例对象，如果尚未注册，则使用singletonFactory创建并注册一个对象
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							/**
@@ -317,9 +321,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							 * 这个时候，会将普通的beanName，转换为ObjectFactory，后期可以直接调用转换
 							 * @see AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])
 							 */
-							System.out.println("createBean start.....");
+//							System.out.println("createBean start.....");
+							//为给定的合并后BeanDefinition（和参数）创建一个bean实例
 							Object creatBeanObj = createBean(beanName, mbd, args);
-							System.out.println("createBean result....." + creatBeanObj);
+//							System.out.println("createBean result....." + creatBeanObj);
 							return creatBeanObj;
 						} catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there
