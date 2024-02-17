@@ -118,6 +118,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 成功获取到单例，需要对三级缓存进行重新梳理
+	 *
 	 * Add the given singleton object to the singleton cache of this factory.
 	 * <p>To be called for eager registration of singletons.
 	 * @param beanName the name of the bean
@@ -125,9 +127,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+			//放入一级缓存
 			this.singletonObjects.put(beanName, singletonObject);
+			//移除三级缓存
 			this.singletonFactories.remove(beanName);
+			//移除二级缓存
 			this.earlySingletonObjects.remove(beanName);
+			//将beanName放入已注册的单例集合中
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -185,6 +191,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					//初始化实例 （去三级缓存里面，进行查询）
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						//addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+						//getObject 实际上是调用：getEarlyBeanReference
 						singletonObject = singletonFactory.getObject();
 						//初始化成功，放入提前初始化池子（获取到三级缓存的实例，需要放入二级缓存）
 						this.earlySingletonObjects.put(beanName, singletonObject);
@@ -261,7 +269,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					//加入缓存
+					//加入缓存 需要对三级缓存重新进行处理
 					addSingleton(beanName, singletonObject);
 				}
 			}
